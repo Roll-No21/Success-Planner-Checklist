@@ -1,0 +1,42 @@
+(function () {
+  const PARTS = [
+    { key: "botany", label: "Botany", image: "../images/botany_image.jpg", href: "../pages/subject-table.html?data=Biology/botany-data&back=biology.html" },
+    { key: "zoology", label: "Zoology", image: "../images/zoology_image.jpg", href: "../pages/subject-table.html?data=Biology/zoology-data&back=biology.html" }
+  ];
+
+  function applyTheme(theme) { document.body.dataset.theme = theme; localStorage.setItem("sp:theme", theme); }
+
+  async function render() {
+    const summary = await SPProgress.getSummary();
+    const bio = summary.biology || {};
+    const root = document.getElementById("sp-subjects");
+    root.innerHTML = "";
+    PARTS.forEach((p) => {
+      const combined = SPProgress.combine({ [p.key]: bio[p.key] || { percent: 0, updatedDate: null } });
+      const card = document.createElement("div");
+      card.className = "sp-plaque";
+      card.innerHTML = `
+        <img class="sp-plaque-image" src="${p.image}" alt="${p.label}" onerror="this.style.display='none'">
+        <div class="sp-plaque-body">
+          <div class="sp-plaque-title">${p.label}</div>
+          <div class="sp-progress-track"><div class="sp-progress-fill" style="width:${combined.percent}%"></div></div>
+          <div class="sp-plaque-meta">
+            <span>${combined.percent}% complete</span>
+            <span>Updated ${SPUtil.formatDate(combined.updatedDate)}</span>
+          </div>
+        </div>`;
+      card.onclick = () => { SPUtil.playClick(); window.location.href = p.href; };
+      root.appendChild(card);
+    });
+  }
+
+  document.addEventListener("DOMContentLoaded", () => {
+    document.body.dataset.theme = localStorage.getItem("sp:theme") || "light";
+    document.getElementById("sp-theme-toggle").onclick = () => {
+      SPUtil.playClick();
+      applyTheme(document.body.dataset.theme === "dark" ? "light" : "dark");
+    };
+    SPAuth.mountToolbar(document.getElementById("sp-toolbar-slot"));
+    render();
+  });
+})();
