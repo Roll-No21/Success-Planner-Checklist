@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Success Planner</title>
+<link rel="stylesheet" href="../css/main.css">
+<link rel="stylesheet" href="../css/table.css">
+<script src="https://accounts.google.com/gsi/client" async defer></script>
+</head>
+<body>
+  <header class="sp-topbar">
+    <a class="sp-back" href="#" id="sp-back-link">← Back</a>
+    <h1 id="sp-topbar-title">Success Planner</h1>
+    <div class="sp-topbar-right">
+      <button id="sp-theme-toggle" class="sp-theme-toggle">🌗 Theme</button>
+      <div id="sp-toolbar-slot"></div>
+    </div>
+  </header>
+
+  <section class="sp-subject-page-header">
+    <h2 class="sp-title" id="sp-page-title">Loading…</h2>
+    <p class="sp-subtitle" id="sp-page-subtitle"></p>
+    <div class="sp-progress-banner">
+      <div class="sp-progress-track"><div class="sp-progress-fill" id="sp-page-progress-fill" style="width:0%"></div></div>
+      <div class="sp-plaque-meta">
+        <span id="sp-page-progress-text">0% complete</span>
+        <span id="sp-page-updated">Updated —</span>
+      </div>
+    </div>
+  </section>
+
+  <div id="sp-table-root"></div>
+  <footer class="sp-footer">Success Planner — your progress, your pace.</footer>
+
+  <script src="../js/config.js"></script>
+  <script src="../js/util.js"></script>
+  <script src="../js/storage.js"></script>
+  <script src="../js/progress-store.js"></script>
+  <script src="../js/auth.js"></script>
+  <script src="../js/table-engine.js"></script>
+  <script>
+    (function () {
+      function applyTheme(theme) { document.body.dataset.theme = theme; localStorage.setItem("sp:theme", theme); }
+      document.body.dataset.theme = localStorage.getItem("sp:theme") || "light";
+      document.getElementById("sp-theme-toggle").onclick = () => {
+        SPUtil.playClick();
+        applyTheme(document.body.dataset.theme === "dark" ? "light" : "dark");
+      };
+
+      const params = new URLSearchParams(window.location.search);
+      const dataParam = params.get("data"); // e.g. "Biology/botany-data"
+      const backParam = params.get("back") || "../index.html";
+      document.getElementById("sp-back-link").href = backParam;
+
+      if (!dataParam) {
+        document.getElementById("sp-page-title").textContent = "No subject data specified";
+        return;
+      }
+
+      const script = document.createElement("script");
+      script.src = "../" + dataParam + ".js";
+      script.onload = () => {
+        document.getElementById("sp-page-title").textContent = SUBJECT_DATA.title;
+        document.getElementById("sp-page-subtitle").textContent = SUBJECT_DATA.subtitle || "";
+        document.getElementById("sp-topbar-title").textContent = SUBJECT_DATA.title;
+        document.title = "Success Planner — " + SUBJECT_DATA.title;
+
+        function updateBanner(pct, dateISO) {
+          document.getElementById("sp-page-progress-fill").style.width = pct + "%";
+          document.getElementById("sp-page-progress-text").textContent = pct + "% complete";
+          document.getElementById("sp-page-updated").textContent = "Updated " + SPUtil.formatDate(dateISO);
+        }
+
+        SPAuth.mountToolbar(document.getElementById("sp-toolbar-slot"));
+
+        const table = new SPTable({
+          container: document.getElementById("sp-table-root"),
+          storageKey: dataParam.split("/").pop().replace("-data", "") + "-" + (SUBJECT_META.partKey || "main"),
+          defaultData: SUBJECT_DATA,
+          subjectKey: SUBJECT_META.subjectKey,
+          partKey: SUBJECT_META.partKey,
+          onProgress: updateBanner
+        });
+
+        table.load().then(() => updateBanner(table.progressPercent(), table.data.updatedDate));
+
+        // Title/subtitle editing in editor mode
+        function refreshEditable() {
+          const editor = SPAuth.isEditorMode();
+          const titleEl = document.getElementById("sp-page-title");
+          const subEl = document.getElementById("sp-page-subtitle");
+          titleEl.contentEditable = editor;
+          subEl.contentEditable = editor;
+          titleEl.onblur = () => { table.data.title = titleEl.textContent.trim(); table.persist(false); };
+          subEl.onblur = () => { table.data.subtitle = subEl.textContent.trim(); table.persist(false); };
+        }
+        window.addEventListener("sp:editorchange", refreshEditable);
+        refreshEditable();
+      };
+      document.head.appendChild(script);
+    })();
+  </script>
+</body>
+</html>
