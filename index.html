@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Success Planner</title>
+<link rel="stylesheet" href="css/main.css">
+<script src="https://accounts.google.com/gsi/client" async defer></script>
+</head>
+<body>
+  <header class="sp-topbar">
+    <h1>🌸 Success Planner</h1>
+    <div class="sp-topbar-right">
+      <button id="sp-theme-toggle" class="sp-theme-toggle">🌗 Theme</button>
+      <div id="sp-toolbar-slot"></div>
+    </div>
+  </header>
+
+  <section class="sp-hero" id="sp-hero">
+    <h2 class="sp-hero-title">Plan today. Ace results.</h2>
+    <p class="sp-hero-sub">Track every chapter, lecture, test and revision — all in one place.</p>
+    <span class="sp-updated" id="sp-updated">Last updated: —</span>
+  </section>
+
+  <main>
+    <div class="sp-subjects" id="sp-subjects"></div>
+  </main>
+
+  <footer class="sp-footer">Success Planner — your progress, your pace.</footer>
+
+  <script src="js/config.js"></script>
+  <script src="js/util.js"></script>
+  <script src="js/storage.js"></script>
+  <script src="js/progress-store.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/cherry-blossom.js"></script>
+  <script src="js/main.js"></script>
+</body>
+</html>
