@@ -39,6 +39,13 @@ body[data-theme="dark"] {
 a { color: inherit; }
 
 /* ---------- top bar ---------- */
+body {
+    background-image: url("../images/cherry_tree.png");
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-position: center;
+}
+/* up image */
 .sp-topbar {
   display: flex;
   align-items: center;
