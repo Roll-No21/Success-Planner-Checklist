@@ -6,7 +6,7 @@
    Add this site's URL to "Authorized JavaScript origins".
    ============================================================ */
 window.APP_CONFIG = {
-  GOOGLE_CLIENT_ID: "YOUR_GOOGLE_CLIENT_ID.apps.googleusercontent.com",
+  GOOGLE_CLIENT_ID: "1001318592344-tbsu7nm2cbci1h4c00r111tg3oipa8pq.apps.googleusercontent.com",
 
   // Repo the app syncs progress data to when a user connects GitHub.
   GITHUB_OWNER: "DecodingM-bit",
